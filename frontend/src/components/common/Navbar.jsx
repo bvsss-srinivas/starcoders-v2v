@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { SearchBar } from '../ui/SearchBar';
 import { Bell, Menu, User, ShieldCheck } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
@@ -107,13 +108,16 @@ export function Navbar({ openMobileSidebar }) {
         
         <div className="h-8 w-px bg-[var(--color-brand-border)] mx-1 hidden sm:block"></div>
 
-        <button onClick={logout} className="flex items-center gap-2 rounded-full hover:bg-gray-50 p-1 pr-2 transition-colors border border-transparent hover:border-gray-200">
+        <Link to="/dashboard/settings/profile" className="flex items-center gap-2 rounded-full hover:bg-gray-50 p-1 pr-2 transition-colors border border-transparent hover:border-gray-200">
           <div className="flex h-8 w-8 items-center justify-center rounded-full bg-indigo-100 text-[var(--color-brand-primary)]">
             <User className="h-4 w-4" />
           </div>
           <span className="text-sm font-medium hidden sm:block">
             {user?.username || 'Profile'}
           </span>
+        </Link>
+        <button onClick={logout} className="text-sm font-medium text-gray-500 hover:text-red-600 transition-colors hidden sm:block ml-2">
+          Logout
         </button>
       </div>
     </header>

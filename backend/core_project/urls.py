@@ -30,6 +30,9 @@ urlpatterns = [
     path('api/finance/', include('apps.finance.urls')),
     path('api/community/', include('apps.community.urls')),
     path('api/gamification/', include('apps.gamification.urls')),
+    path('api/courses/', include('apps.courses.urls')),
+    path('api/profiles/', include('apps.profiles.urls')),
+    path('api/ai/', include('apps.ai.urls')),
 ]
 
 if settings.DEBUG:

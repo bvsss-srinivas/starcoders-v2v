@@ -4,8 +4,23 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 
 class User(AbstractUser):
+    ROLE_CHOICES = (
+        ('learner', 'Learner'),
+        ('mentor', 'Mentor'),
+        ('admin', 'Admin'),
+    )
     email = models.EmailField(unique=True)
     phone_number = models.CharField(max_length=20, blank=True, null=True)
+    role = models.CharField(max_length=20, choices=ROLE_CHOICES, default='learner')
+    
+    STATUS_CHOICES = (
+        ('active', 'Active'),
+        ('suspended', 'Suspended'),
+        ('deleted', 'Deleted'),
+    )
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='active')
+    email_verified_at = models.DateTimeField(blank=True, null=True)
+    avatar_url = models.ImageField(upload_to='avatars/', blank=True, null=True)
     
     # Use email as the primary identifier instead of username
     USERNAME_FIELD = 'email'
@@ -63,3 +78,5 @@ def create_user_settings(sender, instance, created, **kwargs):
                 'verification': {'in_app': True, 'email': True},
             }
         )
+        from apps.profiles.models import UserProfile
+        UserProfile.objects.get_or_create(user=instance)

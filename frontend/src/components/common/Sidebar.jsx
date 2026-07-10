@@ -7,13 +7,13 @@ import { useAuth } from '../../context/AuthContext';
 const navItems = [
   { name: 'Dashboard',    path: '/dashboard',    icon: LayoutDashboard },
   { name: 'AI Assistant', path: '/ai-assistant', icon: Target },
-  { name: 'My Profile',   path: '/profile',      icon: Briefcase },
+  { name: 'My Profile',   path: '/dashboard/settings/profile', icon: Briefcase },
   { name: 'Resumes',      path: '/resumes',      icon: FileText },
   { name: 'Interviews',   path: '/interviews',   icon: Video },
   { name: 'Job Board',    path: '/jobs',         icon: BriefcaseBusiness },
   { name: 'Finance',      path: '/finance',      icon: PiggyBank },
   { name: 'Community',    path: '/community',    icon: Users },
-  { name: 'Settings',     path: '/settings',     icon: Settings },
+  { name: 'Settings',     path: '/dashboard/settings/account', icon: Settings },
 ];
 
 export function Sidebar({ isCollapsed, toggleSidebar, isMobileOpen, closeMobile }) {
@@ -94,7 +94,7 @@ export function Sidebar({ isCollapsed, toggleSidebar, isMobileOpen, closeMobile 
               <ul className="space-y-1">
                 <li>
                   <NavLink
-                    to="/admin/verifications"
+                    to="/admin/dashboard"
                     onClick={closeMobile}
                     className={({ isActive }) =>
                       cn(

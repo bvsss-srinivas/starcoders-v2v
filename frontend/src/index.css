@@ -1,23 +1,28 @@
 @import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap');
 
 @theme {
-  --color-brand-primary: #4C3AA0;
-  --color-brand-secondary: #FF6B4A;
-  --color-brand-background: #FAFAF9;
+  --color-brand-primary: #362A6B;
+  --color-brand-secondary: #E8A33D;
+  --color-brand-background: #FAFAF8;
   --color-brand-surface: #FFFFFF;
-  --color-brand-text: #1F2229;
+  --color-brand-text: #0B0B0C;
   --color-brand-text-muted: #6B7280;
   --color-brand-border: #E5E7EB;
+  --color-brand-primary-light: #4A3D8F;
+  --color-brand-secondary-light: #F0BE6A;
   
   --color-status-success: #10B981;
   --color-status-warning: #F59E0B;
   --color-status-error: #EF4444;
 
-  --font-sans: "Inter", system-ui, sans-serif;
+  --font-sans: "IBM Plex Sans", system-ui, sans-serif;
   --font-display: "Space Grotesk", system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, monospace;
   
-  --shadow-sm: 0 1px 2px rgba(31,34,41,0.05);
-  --shadow-md: 0 4px 12px rgba(31,34,41,0.08);
+  --shadow-sm: 0 1px 2px rgba(11,11,12,0.05);
+  --shadow-md: 0 4px 12px rgba(11,11,12,0.08);
+  --shadow-lg: 0 8px 24px rgba(11,11,12,0.12);
   
   --radius-sm: 8px;
   --radius-md: 12px;
@@ -32,7 +37,6 @@
   --color-brand-border: #334155;
 }
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap');
 
 :root {
   font-family: var(--font-sans);

@@ -59,6 +59,7 @@ INSTALLED_APPS = [
     'apps.finance',
     'apps.community',
     'apps.gamification',
+    'apps.courses',
 ]
 
 MIDDLEWARE = [
@@ -202,3 +203,5 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 AUTH_USER_MODEL = 'users.User'
 
 FRONTEND_URL = "http://localhost:5173"
+
+GROQ_API_KEY = os.getenv('GROQ_API_KEY')

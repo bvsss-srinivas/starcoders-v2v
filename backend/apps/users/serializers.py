@@ -18,7 +18,7 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ('id', 'email', 'username', 'first_name', 'last_name', 'phone_number', 'verification_status', 'is_staff', 'settings')
+        fields = ('id', 'email', 'username', 'first_name', 'last_name', 'phone_number', 'role', 'status', 'avatar_url', 'verification_status', 'is_staff', 'settings')
         read_only_fields = ('email', 'id')
 
 class RegisterSerializer(serializers.ModelSerializer):
@@ -27,7 +27,7 @@ class RegisterSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ('email', 'username', 'password', 'password_confirm', 'first_name', 'last_name', 'phone_number')
+        fields = ('email', 'username', 'password', 'password_confirm', 'first_name', 'last_name', 'phone_number', 'role')
         extra_kwargs = {
             'first_name': {'required': True},
             'last_name': {'required': True},
@@ -56,8 +56,11 @@ class RegisterSerializer(serializers.ModelSerializer):
             password=validated_data['password'],
             first_name=validated_data.get('first_name', ''),
             last_name=validated_data.get('last_name', ''),
-            phone_number=validated_data.get('phone_number', '')
+            phone_number=validated_data.get('phone_number', ''),
         )
+        # Assign role manually since create_user might not accept it directly
+        user.role = validated_data.get('role', 'learner')
+        user.save()
         return user
 
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):

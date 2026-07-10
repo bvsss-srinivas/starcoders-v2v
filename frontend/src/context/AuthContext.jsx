@@ -44,7 +44,9 @@ export const AuthProvider = ({ children }) => {
             
             setUser(response.data.user);
             if (response.data.user.is_staff) {
-                navigate('/admin/verifications');
+                navigate('/admin/dashboard');
+            } else if (response.data.user.verification_status !== 'verified') {
+                navigate('/verification');
             } else {
                 navigate('/dashboard');
             }
@@ -62,7 +64,9 @@ export const AuthProvider = ({ children }) => {
             const response = await api.post('users/verify-otp/', { email, password, otp });
             setUser(response.data.user);
             if (response.data.user.is_staff) {
-                navigate('/admin/verifications');
+                navigate('/admin/dashboard');
+            } else if (response.data.user.verification_status !== 'verified') {
+                navigate('/verification');
             } else {
                 navigate('/dashboard');
             }

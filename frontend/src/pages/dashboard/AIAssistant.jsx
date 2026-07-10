@@ -1,11 +1,14 @@
 import React, { useState, useRef, useEffect } from 'react';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import { Button } from '../../components/ui/Button';
 import { Send, Bot, User, Sparkles, Briefcase, FileText } from 'lucide-react';
 import { cn } from '../../lib/utils';
+import api from '../../api/axiosConfig';
 
 export default function AIAssistant() {
     const [messages, setMessages] = useState([
-        { id: 1, role: 'assistant', text: "Hi there! I'm your ElevateHer AI career coach. How can I help you today?", time: '10:00 AM' }
+        { id: 1, role: 'assistant', text: "Hi there! I'm your ElevateHer AI career coach. How can I help you today?", time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) }
     ]);
     const [inputValue, setInputValue] = useState('');
     const [isTyping, setIsTyping] = useState(false);
@@ -19,26 +22,46 @@ export default function AIAssistant() {
         scrollToBottom();
     }, [messages, isTyping]);
 
-    const handleSend = (e) => {
-        e.preventDefault();
+    const handleSend = async (e) => {
+        if (e) e.preventDefault();
         if (!inputValue.trim()) return;
 
-        const newUserMessage = { id: Date.now(), role: 'user', text: inputValue, time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) };
-        setMessages(prev => [...prev, newUserMessage]);
+        const userText = inputValue.trim();
+        const newUserMessage = { id: Date.now(), role: 'user', text: userText, time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) };
+        
+        const updatedMessages = [...messages, newUserMessage];
+        setMessages(updatedMessages);
         setInputValue('');
         setIsTyping(true);
 
-        // Simulate AI response
-        setTimeout(() => {
-            setIsTyping(false);
+        try {
+            const apiMessages = updatedMessages.map(m => ({
+                role: m.role,
+                text: m.text
+            }));
+            
+            const res = await api.post('/ai/chat/', { messages: apiMessages });
+            
             const newAIMessage = { 
                 id: Date.now() + 1, 
                 role: 'assistant', 
-                text: "I'm still learning! Right now I am just a frontend prototype, but soon I will be connected to a real language model to help you with your career goals.", 
+                text: res.data.response, 
                 time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) 
             };
             setMessages(prev => [...prev, newAIMessage]);
-        }, 1500);
+        } catch (err) {
+            console.error("AI Chat Error", err);
+            const errorMessage = err.response?.data?.error || "I'm having trouble connecting to my server right now. Please try again later.";
+            const errorMsg = {
+                id: Date.now() + 1,
+                role: 'assistant',
+                text: errorMessage,
+                time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+            };
+            setMessages(prev => [...prev, errorMsg]);
+        } finally {
+            setIsTyping(false);
+        }
     };
 
     const suggestions = [
@@ -79,9 +102,18 @@ export default function AIAssistant() {
                             <div className={cn("flex flex-col", msg.role === 'user' ? "items-end" : "items-start")}>
                                 <div className={cn(
                                     "px-4 py-2.5 rounded-2xl max-w-[85%] sm:max-w-md",
-                                    msg.role === 'user' ? "bg-[var(--color-brand-primary)] text-white rounded-tr-sm" : "bg-white border border-[var(--color-brand-border)] text-[var(--color-brand-text)] rounded-tl-sm shadow-sm"
+                                    msg.role === 'user' ? "bg-[var(--color-brand-primary)] text-white rounded-tr-sm" : "bg-white border border-[var(--color-brand-border)] text-[var(--color-brand-text)] rounded-tl-sm shadow-sm prose prose-sm max-w-none"
                                 )}>
-                                    <p className="text-sm leading-relaxed">{msg.text}</p>
+                                    {msg.role === 'user' ? (
+                                        <p className="text-sm leading-relaxed whitespace-pre-wrap">{msg.text}</p>
+                                    ) : (
+                                        <ReactMarkdown 
+                                            remarkPlugins={[remarkGfm]} 
+                                            className="text-sm leading-relaxed prose-p:my-1 prose-headings:my-2 prose-ul:my-1 prose-li:my-0.5 prose-strong:text-[var(--color-brand-primary)]"
+                                        >
+                                            {msg.text}
+                                        </ReactMarkdown>
+                                    )}
                                 </div>
                                 <span className="text-[10px] text-gray-400 mt-1 px-1">{msg.time}</span>
                             </div>
@@ -112,7 +144,13 @@ export default function AIAssistant() {
                             {suggestions.map((s, idx) => (
                                 <button 
                                     key={idx} 
-                                    onClick={() => setInputValue(s.text)}
+                                    onClick={() => {
+                                        setInputValue(s.text);
+                                        // A small timeout to ensure state is updated before sending
+                                        setTimeout(() => {
+                                            document.getElementById('ai-chat-form')?.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
+                                        }, 50);
+                                    }}
                                     className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-[var(--color-brand-primary)] bg-[var(--color-brand-primary)]/5 border border-[var(--color-brand-primary)]/20 rounded-full hover:bg-[var(--color-brand-primary)]/10 transition-colors"
                                 >
                                     <s.icon className="h-3 w-3" />
@@ -121,7 +159,7 @@ export default function AIAssistant() {
                             ))}
                         </div>
                     )}
-                    <form onSubmit={handleSend} className="relative flex items-center">
+                    <form id="ai-chat-form" onSubmit={handleSend} className="relative flex items-center">
                         <input
                             type="text"
                             value={inputValue}

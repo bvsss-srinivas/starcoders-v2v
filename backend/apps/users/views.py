@@ -52,12 +52,15 @@ class LoginView(views.APIView):
     throttle_classes = [LoginThrottle]
 
     def post(self, request, *args, **kwargs):
-        email = request.data.get('email')
-        password = request.data.get('password')
+        email = request.data.get('email', '').strip()
+        password = request.data.get('password', '').strip()
+        
+        print(f"Login attempt: email='{email}', password_length={len(password) if password else 0}")
         
         # We need to manually authenticate
         from django.contrib.auth import authenticate
         user = authenticate(request, email=email, password=password)
+        print(f"Authentication result: {user}")
         
         if not user:
             return Response({"detail": "Invalid email or password."}, status=status.HTTP_401_UNAUTHORIZED)

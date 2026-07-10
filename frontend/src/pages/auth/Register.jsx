@@ -12,6 +12,7 @@ export default function Register() {
         username: '',
         email: '',
         phone_number: '',
+        role: 'learner',
         password: '',
         password_confirm: ''
     });
@@ -125,6 +126,19 @@ export default function Register() {
                     onChange={handleChange}
                     error={errors.phone_number ? errors.phone_number[0] : null}
                 />
+
+                <div className="space-y-1">
+                    <label className="text-sm font-medium text-[var(--color-brand-text)]">Account Type</label>
+                    <select
+                        name="role"
+                        value={formData.role}
+                        onChange={handleChange}
+                        className="flex h-10 w-full rounded-md border border-[var(--color-brand-border)] bg-[var(--color-brand-background)] px-3 py-2 text-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[var(--color-brand-primary)] focus:border-transparent disabled:cursor-not-allowed disabled:opacity-50"
+                    >
+                        <option value="learner">Student / Learner</option>
+                        <option value="mentor">Mentor</option>
+                    </select>
+                </div>
 
                 <Input
                     label="Password"

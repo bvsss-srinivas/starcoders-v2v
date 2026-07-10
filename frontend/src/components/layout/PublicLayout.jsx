@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Menu, X } from 'lucide-react';
+import { Menu, X, LogOut } from 'lucide-react';
 import { Button } from '../ui/Button';
+import { useAuth } from '../../context/AuthContext';
 
 export default function PublicLayout({ children }) {
     const navigate = useNavigate();
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+    const { user, logout } = useAuth();
 
     return (
         <div className="relative flex min-h-screen flex-col bg-[var(--color-brand-background)] font-sans text-[var(--color-brand-text)]">
@@ -33,12 +35,35 @@ export default function PublicLayout({ children }) {
 
                 {/* Desktop Actions */}
                 <div className="hidden md:flex items-center gap-4">
-                    <Button variant="ghost" onClick={() => navigate('/login')}>
-                        Log in
-                    </Button>
-                    <Button variant="primary" onClick={() => navigate('/register')}>
-                        Sign Up
-                    </Button>
+                    {user ? (
+                        <>
+                            <span className="text-sm font-medium text-[var(--color-brand-text)]">
+                                Hi, {user.username || 'User'}!
+                            </span>
+                            <Button 
+                                variant="primary" 
+                                onClick={() => navigate(user.is_staff ? '/admin/dashboard' : (user.verification_status === 'verified' ? '/dashboard' : '/verification'))}
+                            >
+                                Go to Dashboard
+                            </Button>
+                            <button 
+                                onClick={logout}
+                                className="text-[var(--color-brand-text-muted)] hover:text-[var(--color-status-error)] transition-colors p-2"
+                                title="Log out"
+                            >
+                                <LogOut className="h-5 w-5" />
+                            </button>
+                        </>
+                    ) : (
+                        <>
+                            <Button variant="ghost" onClick={() => navigate('/login')}>
+                                Log in
+                            </Button>
+                            <Button variant="primary" onClick={() => navigate('/register')}>
+                                Sign Up
+                            </Button>
+                        </>
+                    )}
                 </div>
 
                 {/* Mobile Menu Toggle */}
@@ -59,12 +84,36 @@ export default function PublicLayout({ children }) {
                     <Link to="/careers" className="font-medium hover:text-[var(--color-brand-primary)]" onClick={() => setIsMobileMenuOpen(false)}>Career Growth</Link>
                     <Link to="/success-stories" className="font-medium hover:text-[var(--color-brand-primary)]" onClick={() => setIsMobileMenuOpen(false)}>Success Stories</Link>
                     <hr className="border-[var(--color-brand-border)]" />
-                    <Button variant="ghost" onClick={() => { navigate('/login'); setIsMobileMenuOpen(false); }} className="w-full justify-start">
-                        Log in
-                    </Button>
-                    <Button variant="primary" onClick={() => { navigate('/register'); setIsMobileMenuOpen(false); }} className="w-full">
-                        Sign Up
-                    </Button>
+                    {user ? (
+                        <>
+                            <Button 
+                                variant="primary" 
+                                onClick={() => { 
+                                    navigate(user.is_staff ? '/admin/dashboard' : (user.verification_status === 'verified' ? '/dashboard' : '/verification')); 
+                                    setIsMobileMenuOpen(false); 
+                                }} 
+                                className="w-full"
+                            >
+                                Go to Dashboard
+                            </Button>
+                            <Button 
+                                variant="ghost" 
+                                onClick={() => { logout(); setIsMobileMenuOpen(false); }} 
+                                className="w-full justify-start text-[var(--color-status-error)]"
+                            >
+                                Log out
+                            </Button>
+                        </>
+                    ) : (
+                        <>
+                            <Button variant="ghost" onClick={() => { navigate('/login'); setIsMobileMenuOpen(false); }} className="w-full justify-start">
+                                Log in
+                            </Button>
+                            <Button variant="primary" onClick={() => { navigate('/register'); setIsMobileMenuOpen(false); }} className="w-full">
+                                Sign Up
+                            </Button>
+                        </>
+                    )}
                 </div>
             )}
 

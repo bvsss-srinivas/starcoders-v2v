@@ -16,7 +16,10 @@ api.interceptors.response.use(
         // Handle 401 Unauthorized globally
         if (error.response && error.response.status === 401 && !originalRequest._retry) {
             // Avoid looping if the refresh endpoint itself fails
-            if (originalRequest.url.includes('login/refresh/')) {
+            // Also avoid trying to refresh if the 401 came from a failed login or registration attempt
+            if (originalRequest.url.includes('login/refresh/') || 
+                originalRequest.url.includes('users/login/') || 
+                originalRequest.url.includes('users/register/')) {
                 return Promise.reject(error);
             }
             
