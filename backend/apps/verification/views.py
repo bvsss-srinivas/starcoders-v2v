@@ -41,7 +41,13 @@ class VerificationStatusView(APIView):
         if hasattr(request.user, 'verification'):
             serializer = VerificationStatusSerializer(request.user.verification)
             return Response(serializer.data)
-        return Response({"status": "unverified", "has_document": False}, status=status.HTTP_200_OK)
+        # Auto-create a pending record for existing users who pre-date the verification system
+        from .models import VerificationHistory
+        verification = Verification.objects.create(user=request.user, status='pending')
+        VerificationHistory.objects.create(
+            verification=verification, status='pending', changed_by=request.user
+        )
+        return Response({"status": "pending", "has_document": False}, status=status.HTTP_200_OK)
 
 class AdminVerificationListView(generics.ListAPIView):
     permission_classes = [IsAdminOrVerifier]
@@ -88,7 +94,11 @@ class AdminVerificationDocumentView(APIView):
         if not verification.document_file:
             return Response({"detail": "No document found."}, status=status.HTTP_404_NOT_FOUND)
             
+        import mimetypes
         file_handle = verification.document_file.open('rb')
-        response = FileResponse(file_handle, content_type='application/octet-stream')
-        response['Content-Disposition'] = f'attachment; filename="{verification.document_file.name.split("/")[-1]}"'
+        filename = verification.document_file.name.replace("\\", "/").split("/")[-1]
+        mime_type, _ = mimetypes.guess_type(filename)
+        
+        response = FileResponse(file_handle, content_type=mime_type or 'application/octet-stream')
+        response['Content-Disposition'] = f'attachment; filename="{filename}"'
         return response

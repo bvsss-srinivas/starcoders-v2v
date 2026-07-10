@@ -1,6 +1,10 @@
-from django.urls import path
-from .views import MockInterviewListCreateView
+from django.urls import path, include
+from rest_framework.routers import DefaultRouter
+from .views import MockInterviewViewSet
+
+router = DefaultRouter()
+router.register(r'interviews', MockInterviewViewSet, basename='mockinterview')
 
 urlpatterns = [
-    path('', MockInterviewListCreateView.as_view(), name='interview-list-create'),
+    path('', include(router.urls)),
 ]

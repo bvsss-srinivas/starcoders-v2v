@@ -9,30 +9,40 @@ import { Link } from 'react-router-dom';
 export default function Login() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [otp, setOtp] = useState('');
+    const [requiresOtp, setRequiresOtp] = useState(false);
     const [error, setError] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const { login } = useAuth();
+    const { login, verifyOtp } = useAuth();
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError('');
         setIsSubmitting(true);
         
-        const result = await login(email, password);
-        
-        if (!result.success) {
-            setError(result.error);
+        if (requiresOtp) {
+            const result = await verifyOtp(email, password, otp);
+            if (!result.success) {
+                setError(result.error);
+            }
+        } else {
+            const result = await login(email, password);
+            if (result.requiresOtp) {
+                setRequiresOtp(true);
+            } else if (!result.success) {
+                setError(result.error);
+            }
         }
         setIsSubmitting(false);
     };
 
     return (
         <AuthLayout 
-            title="Welcome back" 
-            subtitle="Sign in to your account to continue."
-            bottomText="Don't have an account?"
-            bottomLinkText="Create one now"
-            bottomLinkTo="/register"
+            title={requiresOtp ? "Two-Factor Authentication" : "Welcome back"} 
+            subtitle={requiresOtp ? "Enter the 6-digit code sent to your email." : "Sign in to your account to continue."}
+            bottomText={requiresOtp ? "" : "Don't have an account?"}
+            bottomLinkText={requiresOtp ? "Cancel" : "Create one now"}
+            bottomLinkTo={requiresOtp ? "/login" : "/register"}
         >
             {error && (
                 <div className="mb-6 flex items-center gap-2 rounded-[var(--radius-sm)] bg-[var(--color-status-error)]/10 p-3 text-sm text-[var(--color-status-error)] border border-[var(--color-status-error)]/20">
@@ -42,35 +52,52 @@ export default function Login() {
             )}
 
             <form onSubmit={handleSubmit} className="space-y-4">
-                <Input
-                    label="Email"
-                    type="email"
-                    required
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                />
+                {!requiresOtp ? (
+                    <>
+                        <Input
+                            label="Email"
+                            type="email"
+                            required
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                        />
 
-                <div className="space-y-1">
-                    <div className="flex items-center justify-between">
-                        <label className="text-sm font-medium text-[var(--color-brand-text)]">Password</label>
-                        <Link to="/forgot-password" className="text-xs font-medium text-[var(--color-brand-primary)] hover:text-[var(--color-brand-secondary)] hover:underline">
-                            Forgot password?
-                        </Link>
+                        <div className="space-y-1">
+                            <div className="flex items-center justify-between">
+                                <label className="text-sm font-medium text-[var(--color-brand-text)]">Password</label>
+                                <Link to="/forgot-password" className="text-xs font-medium text-[var(--color-brand-primary)] hover:text-[var(--color-brand-secondary)] hover:underline">
+                                    Forgot password?
+                                </Link>
+                            </div>
+                            <Input
+                                type="password"
+                                required
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
+                            />
+                        </div>
+                    </>
+                ) : (
+                    <div className="space-y-1">
+                        <Input
+                            label="6-Digit Code"
+                            type="text"
+                            required
+                            maxLength={6}
+                            value={otp}
+                            onChange={(e) => setOtp(e.target.value.replace(/\D/g, ''))}
+                            placeholder="123456"
+                            className="text-center tabular-nums tracking-widest text-lg"
+                        />
                     </div>
-                    <Input
-                        type="password"
-                        required
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                    />
-                </div>
+                )}
 
                 <Button
                     type="submit"
                     className="w-full mt-4"
                     isLoading={isSubmitting}
                 >
-                    Sign in
+                    {requiresOtp ? "Verify & Sign in" : "Sign in"}
                 </Button>
             </form>
         </AuthLayout>

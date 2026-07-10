@@ -2,15 +2,23 @@ from rest_framework import serializers
 from django.contrib.auth import get_user_model
 from django.contrib.auth.password_validation import validate_password
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+from .models import UserSettings
 
 User = get_user_model()
 
+class UserSettingsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UserSettings
+        fields = ('notifications', 'show_full_name_in_forum', 'theme', 'two_factor_enabled')
+
 class UserSerializer(serializers.ModelSerializer):
     verification_status = serializers.ReadOnlyField()
+    is_staff = serializers.ReadOnlyField()
+    settings = UserSettingsSerializer(read_only=True)
 
     class Meta:
         model = User
-        fields = ('id', 'email', 'username', 'first_name', 'last_name', 'phone_number', 'verification_status')
+        fields = ('id', 'email', 'username', 'first_name', 'last_name', 'phone_number', 'verification_status', 'is_staff', 'settings')
         read_only_fields = ('email', 'id')
 
 class RegisterSerializer(serializers.ModelSerializer):

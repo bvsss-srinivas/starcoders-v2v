@@ -7,18 +7,33 @@ import { ConversationList } from '../components/dashboard/ConversationList';
 import { TaskList } from '../components/dashboard/TaskList';
 import { QuickActions } from '../components/dashboard/QuickActions';
 
+// New Widgets
+import { FinanceSnapshotWidget } from '../components/dashboard/FinanceSnapshotWidget';
+import { JobMatchesWidget } from '../components/dashboard/JobMatchesWidget';
+import { CommunityActivityWidget } from '../components/dashboard/CommunityActivityWidget';
+import { UpcomingInterviewWidget } from '../components/dashboard/UpcomingInterviewWidget';
+
+import api from '../api/axiosConfig';
+
 export default function Dashboard() {
     const [isLoading, setIsLoading] = useState(true);
+    const [summary, setSummary] = useState(null);
 
-    // Simulate loading for 800ms to demonstrate perfectly matching skeletons
     useEffect(() => {
-        const timer = setTimeout(() => {
-            setIsLoading(false);
-        }, 800);
-        return () => clearTimeout(timer);
+        const fetchDashboardData = async () => {
+            try {
+                const res = await api.get('/dashboard/summary/');
+                setSummary(res.data);
+            } catch (err) {
+                console.error("Failed to load dashboard summary data");
+            } finally {
+                setIsLoading(false);
+            }
+        };
+        
+        fetchDashboardData();
     }, []);
 
-    // Helper to calculate staggered animation delays
     const getStagger = (index) => ({ animationDelay: `${index * 50}ms`, opacity: 0 });
 
     return (
@@ -27,10 +42,10 @@ export default function Dashboard() {
                 
                 {/* Row 1: Welcome */}
                 <div className="w-full animate-fade-in-up" style={getStagger(0)}>
-                    <WelcomeCard isLoading={isLoading} />
+                    <WelcomeCard isLoading={isLoading} summary={summary} />
                 </div>
 
-                {/* Row 2: Stats */}
+                {/* Row 2: Stats (Legacy placeholders for now, can be wired up later) */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div className="animate-fade-in-up" style={getStagger(1)}>
                         <ProgressRingCard 
@@ -46,9 +61,9 @@ export default function Dashboard() {
                     <div className="animate-fade-in-up" style={getStagger(2)}>
                         <ProgressRingCard 
                             title="Resume Score" 
-                            value={92} 
-                            label="Top 10% candidate" 
-                            trendValue="+12" 
+                            value={summary?.resume?.score || 0} 
+                            label={summary?.resume ? "Latest AI Score" : "Upload to score"}
+                            trendValue={summary?.resume ? "+12" : "0"} 
                             trendIsUp={true} 
                             isLoading={isLoading} 
                             color="var(--color-status-success)"
@@ -69,30 +84,47 @@ export default function Dashboard() {
                     </div>
                 </div>
 
-                {/* Row 3: Charts & Roadmap */}
+                {/* Row 3: New Feature Widgets */}
+                {!isLoading && summary && (
+                    <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 animate-fade-in-up" style={getStagger(4)}>
+                        <div className="lg:col-span-1">
+                            <FinanceSnapshotWidget goals={summary.finance_goals} />
+                        </div>
+                        <div className="lg:col-span-1">
+                            <UpcomingInterviewWidget interview={summary.next_interview} />
+                        </div>
+                        <div className="lg:col-span-1">
+                            <JobMatchesWidget jobs={summary.job_matches} />
+                        </div>
+                        <div className="lg:col-span-1">
+                            <CommunityActivityWidget activities={summary.community_activity} />
+                        </div>
+                    </div>
+                )}
+
+                {/* Row 4: Charts & Roadmap */}
                 <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
-                    <div className="lg:col-span-3 animate-fade-in-up" style={getStagger(4)}>
+                    <div className="lg:col-span-3 animate-fade-in-up" style={getStagger(5)}>
                         <CareerChart isLoading={isLoading} />
                     </div>
-                    <div className="lg:col-span-2 animate-fade-in-up" style={getStagger(5)}>
+                    <div className="lg:col-span-2 animate-fade-in-up" style={getStagger(6)}>
                         <RoadmapStepper isLoading={isLoading} />
                     </div>
                 </div>
 
-                {/* Row 4: Lists */}
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    <div className="animate-fade-in-up" style={getStagger(6)}>
+                {/* Row 5: Lists & Quick Actions */}
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <div className="animate-fade-in-up" style={getStagger(7)}>
                         <ConversationList isLoading={isLoading} />
                     </div>
-                    <div className="animate-fade-in-up" style={getStagger(7)}>
+                    <div className="animate-fade-in-up" style={getStagger(8)}>
                         <TaskList isLoading={isLoading} />
+                    </div>
+                    <div className="animate-fade-in-up" style={getStagger(9)}>
+                        <QuickActions isLoading={isLoading} />
                     </div>
                 </div>
 
-                {/* Row 5: Quick Actions */}
-                <div className="w-full animate-fade-in-up" style={getStagger(8)}>
-                    <QuickActions isLoading={isLoading} />
-                </div>
             </div>
         </div>
     );

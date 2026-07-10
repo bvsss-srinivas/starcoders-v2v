@@ -1,0 +1,33 @@
+{% extends "admin/base_site.html" %}
+{% block content %}
+<div style="max-width:500px;margin:40px auto;background:#fff;padding:32px;border-radius:12px;box-shadow:0 2px 16px rgba(0,0,0,.08);">
+  <h2 style="color:#ef4444;margin-bottom:8px;">Reject Verification</h2>
+  <p style="color:#555;margin-bottom:24px;">
+    You are about to reject the identity verification submitted by
+    <strong>{{ verification.user.email }}</strong>.
+    Please provide a clear reason that will be shown to the user.
+  </p>
+  <form method="post">
+    {% csrf_token %}
+    <label for="reason" style="font-weight:600;display:block;margin-bottom:8px;">Rejection Reason *</label>
+    <textarea
+      id="reason"
+      name="reason"
+      rows="4"
+      required
+      placeholder="e.g. The document image is blurry or unreadable. Please upload a clearer copy."
+      style="width:100%;padding:10px;border:1px solid #d1d5db;border-radius:8px;font-size:14px;resize:vertical;"
+    ></textarea>
+    <div style="margin-top:20px;display:flex;gap:12px;">
+      <button type="submit"
+        style="background:#ef4444;color:#fff;border:none;padding:10px 24px;border-radius:8px;font-weight:600;cursor:pointer;font-size:14px;">
+        ✗ Confirm Rejection
+      </button>
+      <a href="{% url 'admin:verification_verification_changelist' %}"
+        style="padding:10px 24px;border:1px solid #d1d5db;border-radius:8px;font-weight:600;color:#374151;text-decoration:none;font-size:14px;">
+        Cancel
+      </a>
+    </div>
+  </form>
+</div>
+{% endblock %}

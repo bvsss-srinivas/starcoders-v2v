@@ -26,6 +26,10 @@ urlpatterns = [
     path('api/interviews/', include('apps.interviews.urls')),
     path('api/dashboard/', include('apps.dashboard.urls')),
     path('api/verification/', include('apps.verification.urls')),
+    path('api/jobs/', include('apps.jobs.urls')),
+    path('api/finance/', include('apps.finance.urls')),
+    path('api/community/', include('apps.community.urls')),
+    path('api/gamification/', include('apps.gamification.urls')),
 ]
 
 if settings.DEBUG:

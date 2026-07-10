@@ -25,19 +25,52 @@ export const AuthProvider = ({ children }) => {
         checkAuth();
     }, []);
 
+    // Manage Dark Mode
+    useEffect(() => {
+        if (user?.settings?.theme === 'dark') {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
+    }, [user?.settings?.theme]);
+
     const login = async (email, password) => {
         try {
             const response = await api.post('users/login/', { email, password });
             
-            // Backend sets access and refresh HttpOnly cookies automatically.
-            // We just need to set the user state.
+            if (response.data.requires_otp) {
+                return { success: true, requiresOtp: true };
+            }
+            
             setUser(response.data.user);
-            navigate('/dashboard');
+            if (response.data.user.is_staff) {
+                navigate('/admin/verifications');
+            } else {
+                navigate('/dashboard');
+            }
             return { success: true };
         } catch (error) {
             return {
                 success: false,
                 error: error.response?.data?.detail || 'Invalid email or password.'
+            };
+        }
+    };
+
+    const verifyOtp = async (email, password, otp) => {
+        try {
+            const response = await api.post('users/verify-otp/', { email, password, otp });
+            setUser(response.data.user);
+            if (response.data.user.is_staff) {
+                navigate('/admin/verifications');
+            } else {
+                navigate('/dashboard');
+            }
+            return { success: true };
+        } catch (error) {
+            return {
+                success: false,
+                error: error.response?.data?.detail || 'Invalid OTP.'
             };
         }
     };
@@ -77,7 +110,7 @@ export const AuthProvider = ({ children }) => {
     }
 
     return (
-        <AuthContext.Provider value={{ user, setUser, loading, checkAuth, login, register, logout }}>
+        <AuthContext.Provider value={{ user, setUser, loading, checkAuth, login, verifyOtp, register, logout }}>
             {children}
         </AuthContext.Provider>
     );

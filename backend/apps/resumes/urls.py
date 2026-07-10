@@ -1,6 +1,10 @@
-from django.urls import path
-from .views import ResumeListCreateView
+from django.urls import path, include
+from rest_framework.routers import DefaultRouter
+from .views import ResumeViewSet
+
+router = DefaultRouter()
+router.register(r'', ResumeViewSet, basename='resume')
 
 urlpatterns = [
-    path('', ResumeListCreateView.as_view(), name='resume-list-create'),
+    path('', include(router.urls)),
 ]

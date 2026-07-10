@@ -25,11 +25,13 @@ export default function Verification() {
             const res = await api.get('/verification/status/');
             setStatusData(res.data);
             if (res.data.status === 'verified') {
-                await checkAuth(); // refresh user object
+                await checkAuth(); // refresh user object so navbar badge updates
                 navigate('/dashboard');
             }
         } catch (err) {
-            console.error(err);
+            console.error('Failed to fetch verification status:', err);
+            // Show form even if API fails (network issues, etc.)
+            setStatusData({ status: 'pending', has_document: false });
         } finally {
             setIsLoading(false);
         }
@@ -114,7 +116,10 @@ export default function Verification() {
         );
     }
 
-    const needsSubmission = !statusData || (statusData.status === 'pending' && !statusData.has_document);
+    // Show form if: no data, never submitted, unverified (pre-dates system), or pending without doc
+    const needsSubmission = !statusData 
+        || statusData.status === 'unverified' 
+        || (statusData.status === 'pending' && !statusData.has_document);
     const isPendingReview = statusData?.status === 'pending' && statusData?.has_document;
     const isRejected = statusData?.status === 'rejected';
 
@@ -137,10 +142,23 @@ export default function Verification() {
                                 <Clock className="w-10 h-10 text-amber-500" />
                             </div>
                             <h3 className="text-xl font-semibold text-gray-900 mb-2">Verification Under Review</h3>
-                            <p className="text-gray-500 mb-6 leading-relaxed">
-                                Thank you for submitting your document. Our team is securely reviewing your identity. This usually takes 24-48 hours. 
-                                We will notify you once approved.
+                            <p className="text-gray-500 mb-4 leading-relaxed">
+                                Your document has been submitted and is awaiting admin review. This usually takes 24–48 hours.
                             </p>
+                            <div className="bg-amber-50 border border-amber-100 rounded-lg p-4 w-full text-left mb-6">
+                                <p className="text-sm font-semibold text-amber-800 mb-1">What happens next?</p>
+                                <ol className="text-xs text-amber-700 space-y-1 list-decimal list-inside">
+                                    <li>An admin reviews your submitted ID document</li>
+                                    <li>If approved, you'll automatically get full access to the dashboard</li>
+                                    <li>If rejected, you'll see the reason and can resubmit</li>
+                                </ol>
+                            </div>
+                            <button
+                                onClick={() => setStatusData({ ...statusData, has_document: false })}
+                                className="text-xs text-gray-400 underline hover:text-gray-600 transition-colors mt-2"
+                            >
+                                Submitted wrong document? Click here to resubmit
+                            </button>
                         </div>
                     )}
 
