@@ -3,9 +3,9 @@ import { Loader2 } from 'lucide-react';
 import { cn } from '../../lib/utils';
 
 const buttonVariants = {
-  primary: 'bg-gradient-to-r from-[var(--color-brand-primary)] to-[var(--color-brand-secondary)] bg-[length:200%_auto] text-white hover:bg-[position:right_center] hover:-translate-y-[1px] hover:shadow-[var(--shadow-md)] active:opacity-100 active:scale-[0.98] active:translate-y-0 active:shadow-[var(--shadow-sm)] border-transparent shadow-[var(--shadow-sm)]',
-  secondary: 'bg-white text-[var(--color-brand-text)] border border-[var(--color-brand-border)] hover:bg-gray-50 hover:-translate-y-[1px] hover:shadow-[var(--shadow-md)] active:bg-gray-100 active:scale-[0.98] active:translate-y-0 shadow-[var(--shadow-sm)]',
-  ghost: 'bg-transparent text-[var(--color-brand-text)] hover:bg-gray-100 active:bg-gray-200 active:scale-[0.98]',
+  primary: 'bg-[var(--color-brand-primary)] text-white hover:bg-[#3b2a85] hover:-translate-y-[1px] hover:shadow-[var(--shadow-md)] active:opacity-100 active:scale-[0.98] active:translate-y-0 active:shadow-[var(--shadow-sm)] border-transparent shadow-[var(--shadow-sm)]',
+  secondary: 'bg-white text-[var(--color-brand-text)] border border-[var(--color-brand-border)] hover:bg-gray-50 hover:text-[var(--color-brand-primary)] hover:-translate-y-[1px] hover:shadow-[var(--shadow-md)] active:bg-gray-100 active:scale-[0.98] active:translate-y-0 shadow-[var(--shadow-sm)]',
+  ghost: 'bg-transparent text-[var(--color-brand-text)] hover:bg-[var(--color-brand-primary)] hover:text-white active:scale-[0.98] transition-colors',
   destructive: 'bg-[var(--color-status-error)] text-white hover:bg-red-600 hover:-translate-y-[1px] hover:shadow-[var(--shadow-md)] active:bg-red-700 active:scale-[0.98] active:translate-y-0 shadow-[var(--shadow-sm)]',
 };
 

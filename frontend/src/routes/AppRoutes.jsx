@@ -22,6 +22,12 @@ import CommunityForum from '../pages/dashboard/CommunityForum';
 import SettingsPage from '../pages/dashboard/Settings';
 import AdminVerification from '../pages/dashboard/AdminVerification';
 
+import EducationHub from '../pages/EducationHub';
+import FinTech from '../pages/FinTech';
+import Mentorship from '../pages/Mentorship';
+import CareerGrowth from '../pages/CareerGrowth';
+import SuccessStories from '../pages/SuccessStories';
+
 import Verification from '../pages/auth/Verification';
 
 // Authenticated Route Wrapper (just requires login, for /verification page)
@@ -116,6 +122,13 @@ export default function AppRoutes() {
             <Route path="/register" element={<PublicRoute><Register /></PublicRoute>} />
             <Route path="/forgot-password" element={<PublicRoute><ForgotPassword /></PublicRoute>} />
             <Route path="/reset-password/:uidb64/:token" element={<PublicRoute><ResetPassword /></PublicRoute>} />
+            
+            {/* New Public/Marketing Pages */}
+            <Route path="/education" element={<EducationHub />} />
+            <Route path="/fintech" element={<FinTech />} />
+            <Route path="/mentorship" element={<Mentorship />} />
+            <Route path="/careers" element={<CareerGrowth />} />
+            <Route path="/success-stories" element={<SuccessStories />} />
             
             <Route path="/verification" element={<AuthenticatedRoute><Verification /></AuthenticatedRoute>} />
             
